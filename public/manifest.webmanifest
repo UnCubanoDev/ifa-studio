@@ -1,0 +1,27 @@
+{
+  "name": "Ọ̀pẹ̀lẹ̀ Ifá",
+  "short_name": "Ifá Studio",
+  "description": "Cadena de Adivinación Yoruba — Explorá los 256 Odus de Ifá",
+  "start_url": "/ifa-studio/",
+  "scope": "/ifa-studio/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f0b1a",
+  "theme_color": "#8b5cf6",
+  "categories": ["spirituality", "education", "books"],
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/ifa-studio/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/ifa-studio/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
