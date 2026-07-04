@@ -14,5 +14,6 @@ export interface Odu {
 
 export interface SyncMeta {
   lastSyncedAt: string | null
+  signature: string | null
   version: number
 }

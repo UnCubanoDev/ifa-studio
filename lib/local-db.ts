@@ -44,10 +44,31 @@ export async function seedFromBundle(): Promise<number> {
 
   await setSyncMeta({
     lastSyncedAt: new Date().toISOString(),
+    signature: computeSignature(odus),
     version: 1,
   })
 
   return odus.length
+}
+
+export async function clearAll(): Promise<void> {
+  const db = await getDb()
+  const tx = db.transaction(['odus', 'meta'], 'readwrite')
+  await Promise.all([
+    tx.objectStore('odus').clear(),
+    tx.objectStore('meta').clear(),
+    tx.done,
+  ])
+}
+
+function computeSignature(odus: Odu[]): string {
+  let hash = 0
+  const ids = odus.map(o => o.id).sort().join(',')
+  for (let i = 0; i < ids.length; i++) {
+    hash = ((hash << 5) - hash) + ids.charCodeAt(i)
+    hash |= 0
+  }
+  return `${odus.length}:${hash}`
 }
 
 /* ---- Odus ---- */

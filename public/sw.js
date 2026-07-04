@@ -1,10 +1,10 @@
-const CACHE = 'ifa-studio-v1'
+const CACHE = 'ifa-studio-v2'
 const BASE = '/ifa-studio'
+const DATA_URL = `${BASE}/data/odus.json`
 
 const PRECACHE = [
   `${BASE}/`,
   `${BASE}/odu`,
-  `${BASE}/data/odus.json`,
 ]
 
 self.addEventListener('install', (event) => {
@@ -28,19 +28,42 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetchPromise = fetch(event.request).then((response) => {
-        if (response && response.status === 200) {
-          const clone = response.clone()
-          caches.open(CACHE).then((cache) => {
-            cache.put(event.request, clone)
-          })
-        }
-        return response
-      }).catch(() => cached)
+  const url = new URL(event.request.url)
 
-      return cached || fetchPromise
-    }),
-  )
+  if (url.pathname === DATA_URL) {
+    event.respondWith(networkFirst(event.request))
+    return
+  }
+
+  event.respondWith(cacheFirst(event.request))
 })
+
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request)
+    if (response && response.status === 200) {
+      const cache = await caches.open(CACHE)
+      cache.put(request, response.clone())
+    }
+    return response
+  } catch {
+    const cached = await caches.match(request)
+    return cached || new Response(null, { status: 503 })
+  }
+}
+
+async function cacheFirst(request) {
+  const cached = await caches.match(request)
+  if (cached) return cached
+
+  try {
+    const response = await fetch(request)
+    if (response && response.status === 200) {
+      const cache = await caches.open(CACHE)
+      cache.put(request, response.clone())
+    }
+    return response
+  } catch {
+    return new Response(null, { status: 503 })
+  }
+}

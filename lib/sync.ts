@@ -1,21 +1,16 @@
 import type { Odu, SyncMeta } from './types'
-import { getSyncMeta, setSyncMeta, putManyOdus } from './local-db'
+import { getSyncMeta, setSyncMeta, getAllOdus, putManyOdus, clearAll, isSeeded } from './local-db'
 
-const SYNC_API = '/api/odu'
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
-async function fetchOdus(since?: string): Promise<Odu[]> {
-  const params = new URLSearchParams()
-  if (since) params.set('since', since)
-
-  const url = params.toString() ? `${SYNC_API}?${params}` : SYNC_API
-  const res = await fetch(url)
-
-  if (!res.ok) {
-    throw new Error(`Error de sync: ${res.status} ${res.statusText}`)
+function computeSignature(odus: Odu[]): string {
+  let hash = 0
+  const ids = odus.map(o => o.id).sort().join(',')
+  for (let i = 0; i < ids.length; i++) {
+    hash = ((hash << 5) - hash) + ids.charCodeAt(i)
+    hash |= 0
   }
-
-  const data = await res.json()
-  return data.odus as Odu[]
+  return `${odus.length}:${hash}`
 }
 
 export async function sync(): Promise<{ synced: number; ok: boolean }> {
@@ -24,24 +19,42 @@ export async function sync(): Promise<{ synced: number; ok: boolean }> {
   }
 
   try {
-    const meta: SyncMeta | undefined = await getSyncMeta()
-    const changes = await fetchOdus(meta?.lastSyncedAt ?? undefined)
+    const res = await fetch(`${BASE}/data/odus.json?t=${Date.now()}`, {
+      cache: 'no-cache',
+    })
+    if (!res.ok) throw new Error(`Error HTTP ${res.status}`)
 
-    if (changes.length > 0) {
-      await putManyOdus(changes)
+    const remote: Odu[] = await res.json()
+    const remoteSig = computeSignature(remote)
+
+    const meta: SyncMeta | undefined = await getSyncMeta()
+
+    if (meta?.signature === remoteSig) {
+      return { synced: 0, ok: true }
     }
 
-    const latestTimestamp = changes.reduce(
-        (latest, odu) => (odu.updatedAt > latest ? odu.updatedAt : latest),
-        meta?.lastSyncedAt ?? new Date(0).toISOString(),
-    )
+    const localOdus = await getAllOdus()
+    const localSig = localOdus.length > 0 ? computeSignature(localOdus) : null
+
+    if (localSig === remoteSig) {
+      await setSyncMeta({
+        lastSyncedAt: new Date().toISOString(),
+        signature: remoteSig,
+        version: (meta?.version ?? 0) + 1,
+      })
+      return { synced: 0, ok: true }
+    }
+
+    await clearAll()
+    await putManyOdus(remote)
 
     await setSyncMeta({
-      lastSyncedAt: latestTimestamp,
+      lastSyncedAt: new Date().toISOString(),
+      signature: remoteSig,
       version: (meta?.version ?? 0) + 1,
     })
 
-    return { synced: changes.length, ok: true }
+    return { synced: remote.length, ok: true }
   } catch (err) {
     console.error('Fallo en sync:', err)
     return { synced: 0, ok: false }
