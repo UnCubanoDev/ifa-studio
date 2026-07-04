@@ -35,7 +35,8 @@ export async function seedFromBundle(): Promise<number> {
   const already = await isSeeded()
   if (already) return 0
 
-  const res = await fetch('/ifa-studio/data/odus.json')
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+  const res = await fetch(`${basePath}/data/odus.json`)
   if (!res.ok) throw new Error(`Error al cargar bundle: ${res.status}`)
 
   const odus: Odu[] = await res.json()
