@@ -34,7 +34,7 @@ function renderInline(text: string): ReactNode[] {
 }
 
 export default function Markdown({ content, className = '' }: { content: string; className?: string }) {
-  const paragraphs = content.split(/\n{2,}/).filter(Boolean)
+  const paragraphs = content.split('\n').filter(Boolean)
 
   return (
     <div className={`space-y-stack-md ${className}`}>
