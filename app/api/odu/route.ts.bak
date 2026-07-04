@@ -1,0 +1,64 @@
+import { NextResponse } from 'next/server'
+import { getTursoClient } from '@/lib/turso'
+
+export const dynamic = 'force-dynamic'
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const since = searchParams.get('since')
+    const id = searchParams.get('id')
+
+    const db = getTursoClient()
+
+    if (id) {
+      const result = await db.execute({
+        sql: 'SELECT * FROM odus WHERE id = ?',
+        args: [id],
+      })
+      if (result.rows.length === 0) {
+        return NextResponse.json({ error: 'Odu no encontrado' }, { status: 404 })
+      }
+      return NextResponse.json({ odu: mapRow(result.rows[0]) })
+    }
+
+    if (since) {
+      const result = await db.execute({
+        sql: 'SELECT * FROM odus WHERE updated_at > ? ORDER BY updated_at ASC',
+        args: [since],
+      })
+      return NextResponse.json({
+        odus: result.rows.map(mapRow),
+        total: result.rows.length,
+      })
+    }
+
+    const result = await db.execute('SELECT * FROM odus ORDER BY id ASC')
+    return NextResponse.json({
+      odus: result.rows.map(mapRow),
+      total: result.rows.length,
+    })
+  } catch (error) {
+    console.error('Error al consultar Turso:', error)
+    return NextResponse.json(
+        { error: 'Error interno del servidor' },
+        { status: 500 },
+    )
+  }
+}
+
+function mapRow(row: Record<string, unknown>) {
+  return {
+    id: row.id as string,
+    leftBinary: row.left_binary as string,
+    rightBinary: row.right_binary as string,
+    name: row.name as string,
+    nameLeft: row.name_left as string,
+    nameRight: row.name_right as string,
+    contentNace: row.content_nace as string,
+    contentRefranes: row.content_refranes as string,
+    contentDescripcion: row.content_descripcion as string,
+    contentPataki: row.content_pataki as string,
+    updatedAt: row.updated_at as string,
+  }
+}
