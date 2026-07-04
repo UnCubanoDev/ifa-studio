@@ -28,9 +28,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate Odu data
-        run: node scripts/generate-odus-data.js
-
       - name: Remove API routes (incompatibles con export estático)
         run: rm -rf app/api
 
