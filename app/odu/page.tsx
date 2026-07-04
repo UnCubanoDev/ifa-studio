@@ -92,9 +92,6 @@ function OduContent() {
               <h1 className="font-headline-md text-headline-md text-primary tracking-tight leading-tight">
                 {oduName}
               </h1>
-              <p className="mt-0.5 font-label-sm text-label-sm text-outline tracking-wider">
-                {oduSub}
-              </p>
             </div>
 
             <div className="w-11" />
@@ -115,56 +112,6 @@ function OduContent() {
         {/* CONTENT */}
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-lg px-container-margin py-stack-lg">
-
-            {/* HERO */}
-            <section className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden spiritual-glow mb-section-gap">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary-fixed-dim/60 to-primary/80" />
-              <div className="absolute inset-0 opacity-10" style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              }} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5">
-                <span className="font-label-sm text-label-sm text-white/70 uppercase tracking-[0.15em]">Origen Sagrado</span>
-                <p className="font-label-sm text-label-sm text-white/80 italic mt-2 leading-relaxed">
-                  &ldquo;Donde la madera encuentra la voz del ancestro.&rdquo;
-                </p>
-              </div>
-              {syncing && (
-                  <div className="absolute top-3 right-3">
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/50 border-t-white" />
-                  </div>
-              )}
-            </section>
-
-            {/* CULTURAL DIVIDER */}
-            <div className="flex items-center gap-stack-md mb-section-gap">
-              <div className="cultural-divider flex-1" />
-              <span className="material-symbols-outlined text-outline/60">eco</span>
-              <div className="cultural-divider flex-1" />
-            </div>
-
-            {/* TABS */}
-            <div className="flex gap-2 overflow-x-auto no-scrollbar mb-stack-lg">
-              {TABS.map((tab) => {
-                const isActive = activeTab === tab.key
-                return (
-                    <button
-                        key={tab.key}
-                        onClick={() => setActiveTab(tab.key)}
-                        className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full font-label-md text-label-md whitespace-nowrap transition-all active:scale-95 ${
-                            isActive
-                                ? 'bg-primary text-on-primary shadow-md'
-                                : 'bg-surface-container text-on-surface-variant border border-outline-variant/40'
-                        }`}
-                    >
-                      <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>
-                        {tab.icon}
-                      </span>
-                      {tab.label}
-                    </button>
-                )
-              })}
-            </div>
 
             {/* CONTENT CARD */}
             {loading ? (
@@ -201,21 +148,34 @@ function OduContent() {
                 })
             )}
 
-            {/* DECORATIVE BOTTOM */}
-            <div className="flex items-center justify-center gap-stack-md py-section-gap">
-              <div className="cultural-divider flex-1" />
-              <div className="flex gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-outline/40" />
-                <span className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                <span className="w-1.5 h-1.5 rounded-full bg-outline/40" />
-              </div>
-              <div className="cultural-divider flex-1" />
-            </div>
-
           </div>
         </main>
 
-        <div className="pb-[env(safe-area-inset-bottom)]" />
+        {/* BOTTOM NAV */}
+        <nav className="shrink-0 bg-surface-container border-t border-outline-variant/40 pt-2 pb-[env(safe-area-inset-bottom)]">
+          <div className="flex">
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.key
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex flex-1 flex-col items-center gap-0.5 py-1.5 transition-all active:scale-95 ${
+                    isActive ? 'text-primary' : 'text-outline'
+                  }`}
+                >
+                  <span
+                    className="material-symbols-outlined text-2xl"
+                    style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+                  >
+                    {tab.icon}
+                  </span>
+                  <span className="font-label-sm text-label-sm">{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </nav>
       </div>
   )
 }
