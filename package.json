@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/copy-odus-data.js",
     "dev": "next dev",
+    "prebuild": "node scripts/copy-odus-data.js",
     "build": "next build",
     "start": "next start",
     "export": "next build",

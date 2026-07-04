@@ -31,15 +31,23 @@ export async function isSeeded(): Promise<boolean> {
   return count > 0
 }
 
+async function loadOduData(): Promise<Odu[]> {
+  try {
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+    const res = await fetch(`${basePath}/data/odus.json?t=${Date.now()}`, { cache: 'no-cache' })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return res.json()
+  } catch {
+    const { default: data } = await import('@/lib/odus-data.json')
+    return data as Odu[]
+  }
+}
+
 export async function seedFromBundle(): Promise<number> {
   const already = await isSeeded()
   if (already) return 0
 
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-  const res = await fetch(`${basePath}/data/odus.json`)
-  if (!res.ok) throw new Error(`Error al cargar bundle: ${res.status}`)
-
-  const odus: Odu[] = await res.json()
+  const odus = await loadOduData()
   await putManyOdus(odus)
 
   await setSyncMeta({
