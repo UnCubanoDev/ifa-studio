@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense, useState, useMemo } from 'react'
 import { useSync } from '@/lib/hooks/use-sync'
 import type { Odu } from '@/lib/types'
+import Markdown from '@/components/Markdown'
 
 type Tab = 'nace' | 'refranes' | 'descripcion' | 'pataki'
 
@@ -66,11 +67,11 @@ function OduContent() {
       [odus, oduId],
   )
 
-  function getContent(tab: Tab): string[] {
+  function getContent(tab: Tab): string {
     const field = FIELD_MAP[tab]
     const raw = oduData?.[field]
-    if (raw) return raw.split('\n').filter(Boolean)
-    return [FALLBACK_TEXT[tab]]
+    if (raw) return raw
+    return FALLBACK_TEXT[tab]
   }
 
   return (
@@ -194,13 +195,7 @@ function OduContent() {
 
                         <div className="cultural-divider w-full mb-stack-md" />
 
-                        <div className="space-y-stack-md">
-                          {content.map((p, i) => (
-                              <p key={i} className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                                {p}
-                              </p>
-                          ))}
-                        </div>
+                        <Markdown content={content} />
                       </div>
                   )
                 })
