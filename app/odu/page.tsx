@@ -29,13 +29,6 @@ const FALLBACK_TEXT: Record<Tab, string> = {
   pataki: 'En el principio, Olodumare creó los caminos. Cada Odu guarda la historia de ese momento sagrado cuando el destino fue escrito en el polvo de la tierra.',
 }
 
-const TITLE_MAP: Record<Tab, string> = {
-  nace: 'Esencia',
-  refranes: 'Sabiduría Ancestral',
-  descripcion: 'Naturaleza',
-  pataki: 'Historia Sagrada',
-}
-
 function getOduName(left: string, right: string): string {
   const ODU_NAMES: Record<string, string> = {
     '0000': 'Ogbe', '0001': 'Ogunda', '0010': 'Irete', '0011': 'Irosun',
@@ -135,8 +128,7 @@ function OduContent() {
                         </span>
                           </div>
                           <div>
-                            <h2 className="font-headline-md text-headline-md text-primary">{TITLE_MAP[tab.key]}</h2>
-                            <p className="font-label-sm text-label-sm text-outline uppercase tracking-wider">{tab.label}</p>
+                            <h2 className="font-headline-md text-headline-md text-primary">{tab.label}</h2>
                           </div>
                         </div>
 
