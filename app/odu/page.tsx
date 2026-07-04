@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Suspense, useState, useMemo } from 'react'
+import { Suspense, useState, useMemo, useRef, useCallback } from 'react'
 import { useSync } from '@/lib/hooks/use-sync'
 import type { Odu } from '@/lib/types'
 import Markdown from '@/components/Markdown'
@@ -48,6 +48,12 @@ function OduContent() {
   const { odus, loading, syncing } = useSync()
 
   const [activeTab, setActiveTab] = useState<Tab>('nace')
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  const switchTab = useCallback((tab: Tab) => {
+    setActiveTab(tab)
+    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   const left = searchParams.get('l') || '0000'
   const right = searchParams.get('r') || '0000'
@@ -103,7 +109,7 @@ function OduContent() {
         </header>
 
         {/* CONTENT */}
-        <main className="flex-1 overflow-y-auto">
+        <main ref={contentRef} className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-lg px-container-margin py-stack-lg">
 
             {/* CONTENT CARD */}
@@ -151,7 +157,7 @@ function OduContent() {
               return (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
+                  onClick={() => switchTab(tab.key)}
                   className={`flex flex-1 flex-col items-center gap-0.5 py-1.5 transition-all active:scale-95 ${
                     isActive ? 'text-primary' : 'text-outline'
                   }`}
