@@ -22,11 +22,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm ci
 
       - name: Generate Odu data
         run: node scripts/generate-odus-data.js
@@ -35,7 +35,7 @@ jobs:
         run: rm -rf app/api
 
       - name: Build static export
-        run: npm run build
+        run: pnpm build
         env:
           NODE_ENV: production
 
